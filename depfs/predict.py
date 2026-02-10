@@ -1,4 +1,5 @@
-import numpy 
+import numpy
+from scipy.signal import find_peaks
 
 
 class Predictor:

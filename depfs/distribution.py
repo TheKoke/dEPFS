@@ -3,12 +3,13 @@ from scipy.stats import multivariate_normal
 
 
 class Distribution:
-    def __init__(self):
+    def __init__(self, seed: int) -> None:
         self._mean: numpy.ndarray = None
         self._sigma: numpy.ndarray = None
         self._covariance: numpy.ndarray = None
         self._search_path: numpy.ndarray = None
         self._evolution_path: numpy.ndarray = None
+        self.initialize(seed)
 
     def initialize(self, seed: int) -> None:
         pass

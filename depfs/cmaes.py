@@ -1,5 +1,7 @@
 import numpy
+from bunch import Bunch
 from fitness import Fitness
+from dataset import Dataset
 from distribution import Distribution
 
 
@@ -8,13 +10,16 @@ class CMAES:
         self._nu = nu
         self._distr = distribution
 
-    def run_generation(self) -> list[list[float]]:
+    def execute(self, dataset: Dataset) -> list[float]:
+        pass
+
+    def run(self, bunch: Bunch) -> list[float]:
+        pass
+
+    def run_generation(self, bunch: Bunch) -> list[list[float]]:
         pass
 
     def update(self, generation: list[list[float]]) -> None:
-        pass
-
-    def execute(self) -> list[float]:
         pass
 
     def save(self) -> str:

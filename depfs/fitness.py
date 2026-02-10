@@ -1,5 +1,4 @@
 import numpy
-from scipy.signal import find_peaks
 
 
 class Fitness:
@@ -7,9 +6,6 @@ class Fitness:
         pass
 
     def calculate(self, true: list[int], predicted: list[int]) -> float:
-        pass
-
-    def collect_true(self) -> list[float]:
         pass
 
 
