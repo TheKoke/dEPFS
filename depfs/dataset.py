@@ -12,10 +12,10 @@ class Dataset:
     def spectra(self) -> list[Spectrum]:
         pass
     
-    def pick_train(self) -> list[Bunch]:
+    def pick_train(self, n: int) -> list[Bunch]:
         pass
 
-    def pick_test(self) -> list[Bunch]:
+    def pick_test(self, n: int) -> list[Bunch]:
         pass
 
 
