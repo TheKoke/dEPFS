@@ -21,25 +21,41 @@ class Distribution:
         self._isotropic_path = numpy.zeros(n)
         self._anisotropic_path = numpy.zeros(n)
 
+    @property
+    def isotropic_decay(self) -> float:
+        return 3 / len(self._mean)
+    
+    @property
+    def anisotropic_decay(self) -> float:
+        return 4 / len(self._mean)
+
     def sample(self) -> list[float]:
         return self._N.rvs().tolist()
 
     def update(self, generation: list[list[float]]) -> None:
-        pass
+        new_mean = self.updated_mean(generation)
+        new_isotropic = self.updated_isotropic_path(new_mean)
     
-    def update_mean(self) -> None:
+    def updated_mean(self, generation: list[list[float]]) -> float:
+        mu = len(generation) // 2
+        weights = self.calculate_weights(mu)
+
+        best = generation[:mu]
+        return numpy.average(best, axis=0, weights=weights)
+    
+    def updated_isotropic_path(self, new_mean: float) -> numpy.ndarray:
         pass
 
-    def update_covariance(self) -> None:
+    def updated_sigma(self, new_isotropic: numpy.ndarray) -> numpy.ndarray:
         pass
 
-    def update_isotropic_path(self) -> None:
+    def updated_anisotropic_path(self, new_mean: float, new_isotropic: numpy.ndarray) -> numpy.ndarray:
         pass
 
-    def update_anisotropic_path(self) -> None:
+    def updated_covariance(self, new_mean: float, new_anisotropic: numpy.ndarray) -> numpy.ndarray:
         pass
 
-    def calculate_weights(self) -> list[float]:
+    def calculate_weights(self, mu: int) -> list[float]:
         pass
 
 

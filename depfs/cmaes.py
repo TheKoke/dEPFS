@@ -2,6 +2,7 @@ import numpy
 from bunch import Bunch
 from fitness import Fitness
 from dataset import Dataset
+from predict import Predictor
 from distribution import Distribution
 
 
