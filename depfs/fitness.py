@@ -6,7 +6,17 @@ class Fitness:
         pass
 
     def calculate(self, true: list[int], predicted: list[int]) -> float:
-        pass
+        sieved = self.sieve(true, predicted)
+
+        chi2 = 0
+        for i in range(len(true)):
+            chi2 += (true[i] - sieved[i]) ** 2
+
+        chi2 /= len(true)
+        chi2 = chi2 if len(true) <= len(predicted) else chi2 + 10 * (len(predicted) - len(true))
+        chi2 = chi2 if len(true) >= len(predicted) else chi2 + 10 * (len(true) - len(predicted))
+
+        return chi2
 
     def sieve(self, true: list[int], predicted: list[int]) -> list[int]:
         sieved = []

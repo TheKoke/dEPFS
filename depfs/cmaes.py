@@ -7,9 +7,12 @@ from distribution import Distribution
 
 
 class CMAES:
-    def __init__(self, nu: int, distribution: Distribution) -> None:
-        self._nu = nu
+    def __init__(self, distribution: Distribution) -> None:
         self._distr = distribution
+    
+    @property
+    def lamda(self) -> int:
+        return 4 + int(3 * numpy.log(self._distr.n))
 
     def execute(self, dataset: Dataset) -> list[float]:
         pass

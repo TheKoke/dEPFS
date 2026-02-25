@@ -10,7 +10,13 @@ class Dataset:
 
     @property
     def spectra(self) -> list[Spectrum]:
-        pass
+        spectra = []
+
+        for matrix in self._matrixes:
+            for spectrum in matrix.slices:
+                spectra.append(spectrum)
+
+        return spectra
     
     def pick_train(self, n: int) -> list[Bunch]:
         pass

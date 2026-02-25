@@ -6,7 +6,6 @@ from scipy.stats import multivariate_normal
 
 class Distribution:
     def __init__(self, dim: int) -> None:
-        self._mu = 0
         self._mean: numpy.ndarray = None
         self._sigma: numpy.ndarray = None
         self._covariance: numpy.ndarray = None
@@ -25,6 +24,10 @@ class Distribution:
         self._anisotropic_path = numpy.zeros(n)
 
     @property
+    def n(self) -> int:
+        return len(self._mean)
+
+    @property
     def isotropic_decay(self) -> float:
         return 3 / len(self._mean)
     
@@ -39,12 +42,19 @@ class Distribution:
         new_mean = self.updated_mean(generation)
         new_isotropic = self.updated_isotropic_path(new_mean)
         new_sigma = self.updated_sigma(new_isotropic)
+        new_anisotropic = self.updated_anisotropic_path(new_mean, new_isotropic)
+        new_covariance = self.updated_covariance(generation, new_anisotropic)
+
+        self._mean = new_mean.copy()
+        self._sigma = new_sigma.copy()
+        self._covariance = new_covariance.copy()
+        self._isotropic_path = new_isotropic.copy()
+        self._anisotropic_path = new_anisotropic.copy()
     
-    def updated_mean(self, generation: list[list[float]]) -> float:
-        self._mu = len(generation) // 2
+    def updated_mean(self, generation: list[list[float]]) -> numpy.ndarray:
         weights = self.calculate_weights()
 
-        best = generation[:self._mu]
+        best = generation[:self.n // 2]
         return numpy.average(best, axis=0, weights=weights)
     
     def updated_isotropic_path(self, new_mean: float) -> numpy.ndarray:
@@ -61,11 +71,10 @@ class Distribution:
         return new_psigma
 
     def updated_sigma(self, new_isotropic: numpy.ndarray) -> numpy.ndarray:
-        n = len(self._mean)
         csigma = self.isotropic_decay
         old_sigma = self._sigma.copy()
 
-        expected_norm = numpy.sqty(2) * gamma((n + 1) / 2) / gamma(n / 2)
+        expected_norm = numpy.sqty(2) * gamma((self.n + 1) / 2) / gamma(self.n / 2)
         psigma_norm = norm(new_isotropic)
 
         return old_sigma * numpy.exp(csigma * (psigma_norm / expected_norm - 1))
@@ -73,9 +82,8 @@ class Distribution:
     def updated_anisotropic_path(self, new_mean: float, new_isotropic: numpy.ndarray) -> numpy.ndarray:
         mueff = self.mu_effective()
         cc = self.anisotropic_decay
-        old_pc = self._anisotropic_path.copy()
 
-        discount = (1 - cc) * old_pc
+        discount = (1 - cc) * new_isotropic
         displacement = (new_mean - self._mean) / self._sigma
 
         new_pc = discount + numpy.sqrt(cc(2 - cc)) * numpy.sqrt(mueff) * displacement
@@ -83,19 +91,19 @@ class Distribution:
         return new_pc
 
     def updated_covariance(self, generation: list[list[float]], new_anisotropic: numpy.ndarray) -> numpy.ndarray:
-        n = len(self._mean)
         mueff = self.mu_effective()
         weights = self.calculate_weights()
 
-        c1 = 2 / n ** 2
-        cmu = mueff / n ** 2
+        c1 = 2 / self.n ** 2
+        cmu = mueff / self.n ** 2
         
         discount = (1 - c1 - cmu) * self._covariance
         rank_one = c1 * numpy.outer(new_anisotropic, new_anisotropic)
 
-        rank_mu = numpy.zeros((n, n))
-        for i in range(len(generation) // 2):
-            pass
+        rank_mu = numpy.zeros((self.n, self.n))
+        for i in range(self.n // 2):
+            current = (generation[i] - self._mean) / self._sigma
+            rank_mu += weights[i] * numpy.outer(current, current)
 
         rank_mu *= cmu
 
@@ -106,7 +114,7 @@ class Distribution:
         return numpy.power(numpy.array(w), 2).sum() ** (-1)
 
     def calculate_weights(self) -> list[float]:
-        pass
+        return numpy.log(self.n // 2 + 1 / 2) - numpy.log(numpy.arange(1, self.n // 2 + 1))
 
 
 if __name__ == '__main__':
