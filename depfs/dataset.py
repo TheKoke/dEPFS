@@ -18,11 +18,19 @@ class Dataset:
 
         return spectra
     
-    def pick_train(self, n: int) -> list[Bunch]:
-        pass
+    def split(self, nbunch: int) -> tuple[list[Bunch], list[Bunch]]:
+        spectra = self.spectra.copy()
+        shuffled = []
 
-    def pick_test(self, n: int) -> list[Bunch]:
-        pass
+        for i in range(len(spectra)):
+            index = numpy.random.randint(0, len(spectra))
+            shuffled.append(spectra.pop(index))
+
+        bunches = [Bunch(shuffled[i * nbunch: (i + 1) * nbunch]) for i in range(len(shuffled) // nbunch)]
+        train = bunches[:4 * len(bunches) // 5]
+        test = bunches[4 * len(bunches) // 5:]
+
+        return train, test
 
 
 if __name__ == '__main__':

@@ -1,7 +1,6 @@
 import numpy
 from bunch import Bunch
 from fitness import Fitness
-from dataset import Dataset
 from predict import Predictor
 from distribution import Distribution
 
@@ -14,16 +13,19 @@ class CMAES:
     def lamda(self) -> int:
         return 4 + int(3 * numpy.log(self._distr.n))
 
-    def execute(self, dataset: Dataset) -> list[float]:
+    def execute(self, data: list[Bunch]) -> list[float]:
         pass
 
     def run(self, bunch: Bunch) -> list[float]:
         pass
 
     def run_generation(self, bunch: Bunch) -> list[list[float]]:
-        pass
+        coeffs = self._distr.sample()
 
     def update(self, generation: list[list[float]]) -> None:
+        pass
+
+    def test(self, data: list[Bunch]) -> float:
         pass
 
     def save(self) -> str:

@@ -6,17 +6,17 @@ class Bunch:
     def __init__(self, spectra: list[Spectrum]) -> None:
         self._spectra = spectra
 
-    def pick_train_x(self) -> list[numpy.ndarray]:
-        pass
-    
-    def pick_test_x(self) -> list[list[int]]:
-        pass
+    def data_x(self) -> list[numpy.ndarray]:
+        numbers = []
+        for i in range(len(self._spectra)):
+            numbers.append(self._spectra[i].numbers)
+        return numbers
 
-    def pick_train_y(self) -> list[numpy.ndarray]:
-        pass
-
-    def pick_test_y(self) -> list[list[int]]:
-        pass
+    def data_y(self) -> list[list[float]]:
+        peaks = []
+        for i in range(len(self._spectra)):
+            peaks.append(self._spectra[i].peaks)
+        return peaks
 
 
 if __name__ == '__main__':
