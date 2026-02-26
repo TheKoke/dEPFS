@@ -1,7 +1,7 @@
 import os
 import pickle
-from matrix import Matrix
 from dataset import Dataset
+from models.matrix import Matrix
 
 
 class Converter:

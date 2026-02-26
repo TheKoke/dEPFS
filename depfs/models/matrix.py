@@ -2,10 +2,10 @@ import os
 import numpy
 import pickle
 
-from slice import Slicer
-from smoothing import QH353
-from spectrum import Spectrum
-from density import DensityMatrix
+from models.slice import Slicer
+from models.smoothing import QH353
+from models.spectrum import Spectrum
+from models.density import DensityMatrix
 
 
 class Matrix:

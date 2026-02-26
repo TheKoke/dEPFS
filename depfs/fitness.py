@@ -3,18 +3,18 @@ import numpy
 
 class Fitness:
     def __init__(self) -> None:
-        pass
+        self.__penalty = 100
 
     def calculate(self, true: list[int], predicted: list[int]) -> float:
         sieved = self.sieve(true, predicted)
 
         chi2 = 0
-        for i in range(len(true)):
+        for i in range(len(sieved)):
             chi2 += (true[i] - sieved[i]) ** 2
 
-        chi2 /= len(true)
-        chi2 = chi2 if len(true) <= len(predicted) else chi2 + 10 * (len(predicted) - len(true))
-        chi2 = chi2 if len(true) >= len(predicted) else chi2 + 10 * (len(true) - len(predicted))
+        chi2 = chi2 if len(true) == 0 else chi2 / len(true)
+        chi2 = chi2 if len(true) <= len(predicted) else chi2 + self.__penalty * (len(predicted) - len(true))
+        chi2 = chi2 if len(true) >= len(predicted) else chi2 + self.__penalty * (len(true) - len(predicted))
 
         return chi2
 

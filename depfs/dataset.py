@@ -1,7 +1,7 @@
 import numpy
 from bunch import Bunch
-from matrix import Matrix
-from spectrum import Spectrum
+from models.matrix import Matrix
+from models.spectrum import Spectrum
 
 
 class Dataset:
@@ -13,8 +13,9 @@ class Dataset:
         spectra = []
 
         for matrix in self._matrixes:
-            for spectrum in matrix.slices:
-                spectra.append(spectrum)
+            for slice in matrix.slices:
+                if matrix.slices[slice].numbers.max() > 0:
+                    spectra.append(matrix.slices[slice])
 
         return spectra
     

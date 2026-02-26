@@ -10,6 +10,9 @@ class Predictor:
 
     @property
     def normalized(self) -> numpy.ndarray:
+        if self._spectrum.max() == 0:
+            return self._spectrum
+        
         return self._spectrum / self._spectrum.max()
 
     def predict(self, coeffs: list[float]) -> list[float]:
@@ -31,7 +34,7 @@ class Predictor:
             w += w_coeffs[i] * x ** i
 
         peaks, _ = find_peaks(y, height=h, prominence=p, width=w)
-        return peaks + 1
+        return (peaks + 1).tolist()
 
 
 if __name__ == '__main__':

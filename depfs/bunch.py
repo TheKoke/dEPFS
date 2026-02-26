@@ -1,5 +1,5 @@
 import numpy
-from spectrum import Spectrum
+from models.spectrum import Spectrum
 
 
 class Bunch:
