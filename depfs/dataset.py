@@ -1,5 +1,4 @@
 import numpy
-from bunch import Bunch
 from models.matrix import Matrix
 from models.spectrum import Spectrum
 
@@ -19,19 +18,25 @@ class Dataset:
 
         return spectra
     
-    def split(self, nbunch: int) -> tuple[list[Bunch], list[Bunch]]:
+    def split(self, seed: int) -> tuple[list[Spectrum], list[Spectrum]]:
         spectra = self.spectra.copy()
-        shuffled = []
+        numpy.random.seed(seed)
+        numpy.random.shuffle(spectra)
 
-        for i in range(len(spectra)):
-            index = numpy.random.randint(0, len(spectra))
-            shuffled.append(spectra.pop(index))
+        split_idx = int(len(spectra) * 0.8)
+        return spectra[:split_idx], spectra[split_idx:]
+    
+    def train_x(self, seed: int = 42) -> list[numpy.ndarray]:
+        pass
 
-        bunches = [Bunch(shuffled[i * nbunch: (i + 1) * nbunch]) for i in range(len(shuffled) // nbunch)]
-        train = bunches[:4 * len(bunches) // 5]
-        test = bunches[4 * len(bunches) // 5:]
+    def train_y(self, seed: int = 42) -> list[numpy.ndarray]:
+        pass
 
-        return train, test
+    def test_x(self, seed: int = 42) -> list[numpy.ndarray]:
+        pass
+
+    def test_y(self, seed: int = 42) -> list[numpy.ndarray]:
+        pass
 
 
 if __name__ == '__main__':
