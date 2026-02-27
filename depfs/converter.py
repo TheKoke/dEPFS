@@ -1,6 +1,6 @@
 import os
 import pickle
-from dataset import Dataset
+from dataset_depfinn import Dataset
 from models.matrix import Matrix
 
 

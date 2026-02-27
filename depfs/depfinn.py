@@ -48,9 +48,7 @@ class Depfinn:
 
     def _compile_model(self) -> None:
         self._model.compile(
-            optimizer=tensorflow.keras.optimizers.Adam(
-                learning_rate=self._learning_rate
-            ),
+            optimizer=tensorflow.keras.optimizers.Adam(learning_rate=self._learning_rate),
             loss=self._combined_loss,
             metrics=["accuracy"]
         )
@@ -62,10 +60,10 @@ class Depfinn:
         X_val: numpy.ndarray = None,
         Y_val: numpy.ndarray = None,
         batch_size: int = 32,
-        epochs: int = 100
+        epochs: int = 500
     ) -> keras.callbacks.History:
 
-        callbacks = [keras.callbacks.EarlyStopping(patience=10, restore_best_weights=True, start_from_epoch=10)]
+        callbacks = [keras.callbacks.EarlyStopping(patience=30, restore_best_weights=True, start_from_epoch=10)]
 
         history = self._model.fit(
             X_train,
@@ -81,20 +79,20 @@ class Depfinn:
         return history
 
     def predict_mask(self, X: numpy.ndarray, threshold: float = 0.5) -> numpy.ndarray:
-        preds: numpy.ndarray = self._model.predict(X)
+        preds = self._model.predict(X)
         return (preds > threshold).astype(numpy.int32)
 
     def predict_peaks(self, X: numpy.ndarray, threshold: float = 0.5) -> list[list[int]]:
-        binary_masks: numpy.ndarray = self.predict_mask(X, threshold)
-        all_peaks: list[list[int]] = []
+        binary_masks = self.predict_mask(X, threshold)
+        all_peaks = []
 
         for sample in binary_masks:
             labeled_array, num_features = label(sample[:, 0])
-            peak_positions: list[int] = []
+            peak_positions = []
 
             for i in range(1, num_features + 1):
-                indices: numpy.ndarray = numpy.where(labeled_array == i)[0]
-                center: int = int(indices.mean())
+                indices = numpy.where(labeled_array == i)[0]
+                center = int(indices.mean())
                 peak_positions.append(center)
 
             all_peaks.append(peak_positions)
@@ -102,9 +100,6 @@ class Depfinn:
         return all_peaks
 
     def save(self, path: str) -> bool:
-        if not os.path.isdir(path):
-            return False
-
         self._model.save(path)
         return True
 
