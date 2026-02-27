@@ -14,21 +14,23 @@ class CMAES:
         return 4 + int(3 * numpy.log(self._distr.n))
 
     def execute(self, data: list[Bunch]) -> list[float]:
-        pass
+        Gens = 100
+        previous = self._distr.mean
 
-    def run(self, bunch: Bunch) -> list[float]:
-        gen = 1000
+        for i in range(Gens):
+            print(f"Gen #{i}:")
+            for j in range(len(data)):
+                generation, chi2s = self.run_generation(data[j])
+                print(f"\t Bunch #{j}: avg. chi2 = {numpy.average(chi2s)}")
 
-        with open("log.txt", "w") as txt:
-            for _ in range(gen):
-                print(self._distr.mean, file=txt)
-                print("\n", file=txt)
-                current_gen = self.run_generation(bunch)
-                self._distr.update(current_gen)
+            if numpy.power(numpy.subtract(generation, previous), 2).sum() <= 1e-2:
+                break
 
-        return current_gen[0]
+            previous = generation.copy()
 
-    def run_generation(self, bunch: Bunch) -> list[list[float]]:
+        return self._distr.mean
+
+    def run_generation(self, bunch: Bunch) -> tuple[list[list[float]], list[float]]:
         generation = self._distr.sample(self.lamda)
         xs = bunch.data_x()
         ys = bunch.data_y()
@@ -40,13 +42,16 @@ class CMAES:
                 chi2s[j] += Fitness().calculate(ys[i], predicted)
 
         indexes = numpy.argsort(chi2s)
-        return [generation[i] for i in indexes]
+        generation = [generation[i] for i in indexes]
+        self._distr.update(generation)
+        return (generation, chi2s)
 
     def test(self, data: list[Bunch]) -> float:
         pass
 
-    def save(self) -> str:
-        pass
+    def save(self, path: str) -> str:
+        with open(path, "w") as txt:
+            print(self._distr.mean, file=txt)
 
 
 if __name__ == '__main__':

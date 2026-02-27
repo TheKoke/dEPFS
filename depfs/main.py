@@ -1,10 +1,11 @@
 import numpy
 import matplotlib.pyplot as plt
 
-from distribution import Distribution
-from converter import Converter
-from depfinn import Depfinn
 from cmaes import CMAES
+from depfinn import Depfinn
+from adapter import Adapter
+from converter import Converter
+from distribution import Distribution
 
 
 def depfs() -> None:
@@ -14,27 +15,24 @@ def depfs() -> None:
     path = "./pickles"
     conv = Converter(path)
 
-    dataset = conv.read()
-    train, test = dataset.split(nbunch)
+    dataset = Adapter(conv.read())
+    train, test = dataset.to_depfs(nbunch)
 
     distribution = Distribution(nparams)
-    cma_es = CMAES(distribution)
+    cmaes = CMAES(distribution)
 
-    c = cma_es.run(train[0])
-    for i in c:
-        print(i)
+    best = cmaes.execute(train)
+    loss = cmaes.test(test)
+    cmaes.save("cmaes.txt")
+
 
 def depfinn() -> None:
     path = "./pickles"
     conv = Converter(path)
 
-    dataset = conv.read()
+    dataset = Adapter(conv.read())
 
-    X_train = dataset.train_x()
-    Y_train = dataset.train_y()
-
-    X_test = dataset.test_x()
-    Y_test = dataset.test_y()
+    X_train, Y_train, X_test, Y_test = dataset.to_depfinn()
 
     print("Train shape:", X_train.shape, Y_train.shape)
     print("Test shape:", X_test.shape, Y_test.shape)
@@ -54,16 +52,8 @@ def depfinn() -> None:
     print("Test loss:", loss)
     print("Test accuracy:", accuracy)
 
-    predicted_peaks = detector.predict_peaks(X_test)
-
-    # for i, peaks in enumerate(predicted_peaks):
-    #     plt.plot(numpy.arange(1, len(X_test[i]) + 1), X_test[i], color='black')
-    #     plt.plot(numpy.arange(1, len(Y_test[i]) + 1), Y_test[i], color='red')
-    #     plt.scatter(peaks, [X_test[i][j - 1] for j in peaks], color='blue')
-    #     plt.show()
-
     detector.save("./saved/v1.keras")
 
 
 if __name__ == '__main__':
-    depfinn()
+    depfs()
