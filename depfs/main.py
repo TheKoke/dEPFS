@@ -52,8 +52,8 @@ def depfinn() -> None:
     print("Test loss:", loss)
     print("Test accuracy:", accuracy)
 
-    detector.save("./saved/v1.keras")
+    detector.save("./saved/cnn.keras")
 
 
 if __name__ == '__main__':
-    depfs()
+    depfinn()

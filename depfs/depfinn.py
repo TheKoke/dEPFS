@@ -1,11 +1,22 @@
-from __future__ import annotations
-
-import os
-
 import numpy
 import keras
 import tensorflow
 from scipy.ndimage import label
+
+
+@keras.saving.register_keras_serializable(package="MyHooks")
+def combined_loss(y_true: tensorflow.Tensor, y_pred: tensorflow.Tensor) -> tensorflow.Tensor:
+    smooth: float = 1e-6
+
+    y_true = tensorflow.cast(y_true, tensorflow.float32)
+
+    intersection: tensorflow.Tensor = tensorflow.reduce_sum(y_true * y_pred)
+    union: tensorflow.Tensor = tensorflow.reduce_sum(y_true) + tensorflow.reduce_sum(y_pred)
+
+    dice = (2.0 * intersection + smooth) / (union + smooth)
+    bce = tensorflow.keras.losses.binary_crossentropy(y_true,y_pred)
+
+    return 0.5 * bce + 0.5 * (1.0 - dice)
 
 
 class Depfinn:
@@ -33,23 +44,10 @@ class Depfinn:
 
         return keras.models.Model(inputs, outputs)
 
-    def _combined_loss(self, y_true: tensorflow.Tensor, y_pred: tensorflow.Tensor) -> tensorflow.Tensor:
-        smooth: float = 1e-6
-
-        y_true = tensorflow.cast(y_true, tensorflow.float32)
-
-        intersection: tensorflow.Tensor = tensorflow.reduce_sum(y_true * y_pred)
-        union: tensorflow.Tensor = tensorflow.reduce_sum(y_true) + tensorflow.reduce_sum(y_pred)
-
-        dice = (2.0 * intersection + smooth) / (union + smooth)
-        bce = tensorflow.keras.losses.binary_crossentropy(y_true,y_pred)
-
-        return 0.5 * bce + 0.5 * (1.0 - dice)
-
     def _compile_model(self) -> None:
         self._model.compile(
             optimizer=tensorflow.keras.optimizers.Adam(learning_rate=self._learning_rate),
-            loss=self._combined_loss,
+            loss=combined_loss,
             metrics=["accuracy"]
         )
 
@@ -104,7 +102,7 @@ class Depfinn:
         return True
 
     def load(self, path: str) -> None:
-        self._model = keras.models.load_model(path, custom_objects={"_combined_loss": self._combined_loss})
+        self._model = keras.models.load_model(path, custom_objects={"combined_loss": combined_loss})
 
 
 if __name__ == "__main__":
